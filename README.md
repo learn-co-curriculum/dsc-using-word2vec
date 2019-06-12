@@ -3,7 +3,7 @@
 
 ## Introduction
 
-In this lesson, we'll take a look at how the **_Word2Vec_** model actually works, and then we'll learn how we can make use of Word2Vec using the open-source _gensim_ library!
+In this lesson, you'll take a look at how the **_Word2Vec_** model actually works, and then learn how you can make use of Word2Vec using the open-source _gensim_ library!
 
 
 ## Objectives
@@ -17,13 +17,13 @@ You will be able to:
 
 ## How Word2Vec Works
 
-By now, we've gained an understanding of what a word embedding space is, and we've learned a little bit about how the words are represented as Dense vectors. However, we haven't touched on how the model actually learns the correct values for all the word vectors in the embedding space. To put it another way, how does the Word2Vec model learn exactly _where_ to embed each word vector inside the high dimensional embedding space?
+By now, you've gained an understanding of what a word embedding space is, and you've learned a little bit about how the words are represented as Dense vectors. However, you haven't touched on how the model actually learns the correct values for all the word vectors in the embedding space. To put it another way, how does the Word2Vec model learn exactly _where_ to embed each word vector inside the high dimensional embedding space?
 
-Note that this explanation will stay fairly high-level, since you don't actually need to understand every part of how the Word2Vec model works in order to use it effectively for Data Science tasks. If you'd like to dig deeper in to how the model actually works, we recommend starting by reading this tutorial series from Chris McCormick ([part 1](http://mccormickml.com/2016/04/19/word2vec-tutorial-the-skip-gram-model/) and [part 2](http://mccormickml.com/2017/01/11/word2vec-tutorial-part-2-negative-sampling/)), and then moving onto the actual [Word2Vec White Paper by Mikolov et al](https://papers.nips.cc/paper/5021-distributed-representations-of-words-and-phrases-and-their-compositionality.pdf). The graphics used in this lesson are actually from Chris McCormick's excellent blog posts explaining how Word2Vec actually works.
+Note that this explanation will stay fairly high-level, since you don't actually need to understand every part of how the Word2Vec model works in order to use it effectively for Data Science tasks. If you'd like to dig deeper in to how the model actually works, you recommend starting by reading this tutorial series from Chris McCormick ([part 1](http://mccormickml.com/2016/04/19/word2vec-tutorial-the-skip-gram-model/) and [part 2](http://mccormickml.com/2017/01/11/word2vec-tutorial-part-2-negative-sampling/)), and then moving onto the actual [Word2Vec White Paper by Mikolov et al](https://papers.nips.cc/paper/5021-distributed-representations-of-words-and-phrases-and-their-compositionality.pdf). The graphics used in this lesson are actually from Chris McCormick's excellent blog posts explaining how Word2Vec actually works.
 
 ### Window Size and Training Data
 
-At its core, Word2Vec is just another Deep Neural Network. It's not even a particularly complex neural network--The model contains an input layer, a single hidden layer, and and an output layer that uses the softmax activation function, meaning that the model is meant for multiclass classification. The model examines a **_window_** of words, which is a tunable parameter that we can set when working with the model. Let's take a look at a graphic that explains how this all actually looks on a real example of data:
+At its core, Word2Vec is just another Deep Neural Network. It's not even a particularly complex neural network--The model contains an input layer, a single hidden layer, and and an output layer that uses the softmax activation function, meaning that the model is meant for multiclass classification. The model examines a **_window_** of words, which is a tunable parameter that you can set when working with the model. Let's take a look at a graphic that explains how this all actually looks on a real example of data:
 
 <img src='training_data.png'>
 
@@ -35,46 +35,46 @@ So what, exactly, is this Deep Neural Network predicting?
 
 The most clever thing about the Word2Vec model is the type of problem it trains the network to solve, which creates the dense vectors for every word as a side effect! A typical task for a neural network is sentence completion. A trained model should be able to take in a sentence like "the cat sat on the" and output the most likely next word in the sentence, which should be something like "mat", or "floor". This is a form of **_Sequence Generation_**. Given a certain context (the words that came before), the model should be able to generate the next most plausible word (or words) in the sequence. 
 
-Word2Vec takes this idea, and flips it on its head. Instead of predicting the next word given a context, the model trains to predict the context surrounding a given word! This means that given the example word "fox" from above, the model should learn to predict the words "quick", "brown", "jumps", and "over", although crucially, not in any particular order. You're likely asking yourself why a model like this would be useful--there are a massive amount of correct contexts that can surround a given word, which means that the output trained model itself likely isn't very useful to us. This intuition is correct--the _output_ of the model is pretty useless to us.  However, in the case of Word2Vec, it's not the model that we're interested in. It turns out that by training to predict the context window for a given word, the neurons in the hidden layer end up learning the embedding space!  This is the reason why the size of the word vectors output by a Word2Vec model are a parameter that we can set ourselves. If we want word vectors of size 300, then we just include 300 neurons in our hidden layer. If we want vectors of size 100, then we include 100 neurons, and so on. Take a look at the following diagram of the Word2Vec model's architecture:
+Word2Vec takes this idea, and flips it on its head. Instead of predicting the next word given a context, the model trains to predict the context surrounding a given word! This means that given the example word "fox" from above, the model should learn to predict the words "quick", "brown", "jumps", and "over", although crucially, not in any particular order. You're likely asking yourself why a model like this would be useful--there are a massive amount of correct contexts that can surround a given word, which means that the output trained model itself likely isn't very useful to us. This intuition is correct--the _output_ of the model is pretty useless to us.  However, in the case of Word2Vec, it's not the model that we're interested in. It turns out that by training to predict the context window for a given word, the neurons in the hidden layer end up learning the embedding space!  This is the reason why the size of the word vectors output by a Word2Vec model are a parameter that you can set ourselves. If you want word vectors of size 300, then you just include 300 neurons in our hidden layer. If you want vectors of size 100, then you include 100 neurons, and so on. Take a look at the following diagram of the Word2Vec model's architecture:
 
 <img src='skip_gram_net_arch.png'>
 
 ### Hidden Layers as a "Lookup Table"
 
-To recap, the Word2Vec model learns to solve a "fake" problem, which we don't actually care about. The input layer of the network contains 1 neuron for every word in the vocabulary. If there are 10,000 words, then there are 10,000 input neurons, which each one corresponding to a unique word in the vocabulary. Since these input neurons feed into a Dense hidden layer, this means that each neuron will have a unique weight for each of the 10,000 words in the vocabulary. If there are 10,000 words and we want vectors of size 300, then this means the hidden layer will be of shape `[10000, 300]`. To put it another way--each of the 10,000 words will have it's own unique vector of weights, which will be of size 300, since there are 300 neurons.  
+To recap, the Word2Vec model learns to solve a "fake" problem, which you don't actually care about. The input layer of the network contains 1 neuron for every word in the vocabulary. If there are 10,000 words, then there are 10,000 input neurons, which each one corresponding to a unique word in the vocabulary. Since these input neurons feed into a Dense hidden layer, this means that each neuron will have a unique weight for each of the 10,000 words in the vocabulary. If there are 10,000 words and you want vectors of size 300, then this means the hidden layer will be of shape `[10000, 300]`. To put it another way--each of the 10,000 words will have it's own unique vector of weights, which will be of size 300, since there are 300 neurons.  
 
-Once we've trained the model, we don't actually need the output layer anymore--all that matters is the hidden layer, which will now act as a "Lookup Table" that allows us to quickly get the vector for any given word in the vocabulary. 
+Once you've trained the model, you don't actually need the output layer anymore--all that matters is the hidden layer, which will now act as a "Lookup Table" that allows us to quickly get the vector for any given word in the vocabulary. 
 
 <img src='word2vec_weight_matrix_lookup_table.png'>
 
-Here's the beautiful thing about this lookup table--when we input a given word, it is passed into the model in a one-hot encoded format. This means that in a vocabulary of 10,000 words, we'll have a `1` at the element that corresponds to the word that we're looking up the word vector for, and `0` for every other element in the vector. If we multiply this one-hot encoded vector by the weight matrix that is our hidden layer, then the vector for every word will be zeroed out, except for the vector that corresponds to the word that we are most interested in!
+Here's the beautiful thing about this lookup table--when you input a given word, it is passed into the model in a one-hot encoded format. This means that in a vocabulary of 10,000 words, you'll have a `1` at the element that corresponds to the word that we're looking up the word vector for, and `0` for every other element in the vector. If you multiply this one-hot encoded vector by the weight matrix that is our hidden layer, then the vector for every word will be zeroed out, except for the vector that corresponds to the word that you are most interested in!
 
 <img src='matrix_mult_w_one_hot.png'>
 
 ### Understanding the Intuition Behind Word2Vec
 
-So how does the model actually learn the correct weights for each word in a way that captures their semantic context and meaning? The intuition behind Word2Vec is actually quite simple, when we think about the idea of the context window that it's learning to predict. Recall the following quote, which we've seen before:
+So how does the model actually learn the correct weights for each word in a way that captures their semantic context and meaning? The intuition behind Word2Vec is actually quite simple, when you think about the idea of the context window that it's learning to predict. Recall the following quote, which you've seen before:
 
 > "You shall know a word by the company it keeps."  --J.R. Firth, Linguist
 
-In the case of the Word2Vec model, the "company" a word keeps is quite literally the words in the context window around a given word, which the model is learning to predict! We can take this a step further when we realize that words that have similar meanings can be substituted into the same contexts, and the sentence will still make sense! For example, consider the sentence "we have two cats as pets". We could easily substitute the word "cats" for "dogs" and the entire sentence would still make perfect sense. Without even worrying about the embedding space, we can easily understand that words that have similar meanings will likely also be used in many of the same kinds of sentences. The more similar words are, the more sentences in which they are likely to share context windows! This is exactly what the model is learning, and this is why words that are similar end up near each other inside the embedding space. The ways that they are _not_ similar also help the model learn to differentiate between them, since there will be patterns here as well. For instance, consider "ran" and "run", and "walk" and "walked". They differ only in tense. From the perspective of the sentences present in a large text corpus (models are commonly trained on all of wikipedia, to give you an idea of the sheer size and scale of most datasets), the model will see numerous examples of how "ran" is similar to "walked", as well as examples of how the context windows for "ran" are different from "run" in the same ways that the context windows for "walked" are different from "walk"! 
+In the case of the Word2Vec model, the "company" a word keeps are the words surrounding it, and the model is learning to predict these companions! By exploring many different contexts, the model attempts to decipher which words are appropriate in which contexts. For example, consider the sentence "we have two cats as pets". You could easily substitute the word "cats" for "dogs" and the entire sentence would still make perfect sense. While the meaning of the sentence is undoubdetly changed, there is also a lesson regarding the fact that both are nouns and pets. Without even worrying about the embedding space, you can easily understand that words that have similar meanings will likely also be used in many of the same kinds of sentences. The more similar words are, the more sentences in which they are likely to share context windows! This is exactly what the model is learning, and this is why words that are similar end up near each other inside the embedding space. The ways that they are _not_ similar also helps the model learn to differentiate between them, since there will be patterns here as well. For instance, consider "ran" and "run", and "walk" and "walked". They differ only in tense. From the perspective of the sentences present in a large text corpus (models are commonly trained on all of wikipedia, to give you an idea of the sheer size and scale of most datasets), the model will see numerous examples of how "ran" is similar to "walked", as well as examples of how the context windows for "ran" are different from "run" in the same ways that the context windows for "walked" are different from "walk"! 
 
-## Using Word2Vec with Gensim
 
-To end this lesson, we'll quickly look at how we can make use of some of the more common functionality inside a Word2Vec model, which we can make use of through the `gensim` library!
+## Training A Word2Vec Model with Gensim
 
-## Training A Word2Vec Model
+Now, take look at how you can apply the Word2Vec model using the `gensim` library!
 
-To train a Word2Vec model, we first need to import the model from the `gensim` library and instantiate it. Upon instantiation, we'll need to provide the model with certain parameters such as:
-* the dataset we'll be training on
-* the `size` of the word vectors we want to learn 
+To train a Word2Vec model, you first need to import the model from the `gensim` library and instantiate it. Upon instantiation, you'll need to provide the model with certain parameters including:
+
+* the dataset you'll be training on
+* the `size` of the word vectors you want to learn 
 * the `window` size to use when training the model
 * `min_count`, which corresponds to the minimum number of times a word must be used in the corpus in order to be included in the training (for instance, `min_count=5` would only learn word embeddings for words that appear 5 or more times throughout the entire training set)
 * `workers`, the number of threads to use for training, which can speed up processing (`4` is typically used, since most processors nowadays have at least 4 cores). 
 
-Once we've instantiated the model, we'll still need to call the model's `.train()` function, and pass in the following parameters:
+Once you've instantiated the model, you'll still need to call the model's `.train()` function, and pass in the following parameters:
 
-* The same dataset that we passed in at instantation
+* The same dataset that you passed in at instantation
 * The `total_examples`, which is the number of words in the model. You don't need to calculate this manually--instead, you can just pass in the instantiated model's `.corpus_count` attribute for this parameter.
 * The number of `epochs` to train the model for. 
 
@@ -83,7 +83,7 @@ The following example demonstrates how to instantiate and train a Word2Vec model
 ```python
 from gensim.models import Word2Vec
 
-# Let's assume we have our text corpus already tokenized and stored inside the variable 'data'--the regular text preprocessing steps still need to be handled before training a Word2Vec model!
+> **Note**: Normally, you would also perform preprocessing steps such as  tokenization before training a Word2Vec model.
 
 model = Word2Vec(data, size=100, window=5, min_count=1, workers=4)
 
@@ -93,9 +93,9 @@ model.train(data, total_examples=model.corpus_count)
 
 ### Exploring the Embedding Space
 
-Once we have trained the model, we can easily explore the embedding space using the built-in methods and functionality provided by gensim's `Word2Vec` class. 
+Once you have trained the model, you can easily explore the embedding space using the built-in methods and functionality provided by gensim's `Word2Vec` class. 
 
-The actual Word2Vec model itself is quite large. Normally, we only need the actual vectors and the words that correspond to them, which are stored inside of `model.wv` as a `Word2VecKeyedVectors` object. To save time and space, it's usually easiest to just store the `model.wv` inside it's own variable, and then work directly with that. We can then use this model for various sorts of functionality, which we'll demonstrate below!
+The actual Word2Vec model itself is quite large. Normally, you only need the actual vectors and the words that correspond to them, which are stored inside of `model.wv` as a `Word2VecKeyedVectors` object. To save time and space, it's usually easiest to just store the `model.wv` inside it's own variable, and then work directly with that. you can then use this model for various sorts of functionality, which you'll demonstrate below!
 
 ```python
 wv = model.wv
@@ -103,8 +103,8 @@ wv = model.wv
 # Get the most similar words to a given word
 wv.most_similar('Cat')
 
-# Get the least similar words to a given word. NOTE: We'll see in 
-# the next lab that this function doesn't always work the way we   
+# Get the least similar words to a given word. NOTE: you'll see in 
+# the next lab that this function doesn't always work the way you   
 # might intuitively think it will!
 wv.most_similar(negative='Cat')
 
@@ -119,9 +119,9 @@ wv.vectors
 wv.most_similar(positive=['king', 'woman'], negative=['man'])
 ```
 
-In the next lab, we'll train a Word2Vec model, and then explore the embedding space it has learned. 
+In the next lab, you'll train a Word2Vec model, and then explore the embedding space it has learned. 
 
 ## Summary
 
 
-In this lesson, we learned about how the Word2Vec model actually works, and how we can train and use a Word2Vec model using the `gensim` library!
+In this lesson, you learned about how the Word2Vec model actually works, and how you can train and use a Word2Vec model using the `gensim` library!
