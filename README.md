@@ -25,7 +25,7 @@ Note that this explanation will stay fairly high-level, since you don't actually
 
 At its core, Word2Vec is just another Deep Neural Network. It's not even a particularly complex neural network--The model contains an input layer, a single hidden layer, and and an output layer that uses the softmax activation function, meaning that the model is meant for multiclass classification. The model examines a **_window_** of words, which is a tunable parameter that you can set when working with the model. Let's take a look at a graphic that explains how this all actually looks on a real example of data:
 
-<img src='training_data.png'>
+<img src='images/training_data.png'>
 
 In the example above, the model has a window size of 5, meaning that the model considers a word, and the two words to the left and right of this word.  
 
@@ -37,7 +37,7 @@ The most clever thing about the Word2Vec model is the type of problem it trains 
 
 Word2Vec takes this idea, and flips it on its head. Instead of predicting the next word given a context, the model trains to predict the context surrounding a given word! This means that given the example word "fox" from above, the model should learn to predict the words "quick", "brown", "jumps", and "over", although crucially, not in any particular order. You're likely asking yourself why a model like this would be useful--there are a massive amount of correct contexts that can surround a given word, which means that the output trained model itself likely isn't very useful to us. This intuition is correct--the _output_ of the model is pretty useless to us.  However, in the case of Word2Vec, it's not the model that we're interested in. It turns out that by training to predict the context window for a given word, the neurons in the hidden layer end up learning the embedding space!  This is the reason why the size of the word vectors output by a Word2Vec model are a parameter that you can set ourselves. If you want word vectors of size 300, then you just include 300 neurons in our hidden layer. If you want vectors of size 100, then you include 100 neurons, and so on. Take a look at the following diagram of the Word2Vec model's architecture:
 
-<img src='skip_gram_net_arch.png'>
+<img src='images/skip_gram_net_arch.png'>
 
 ### Hidden Layers as a "Lookup Table"
 
@@ -45,11 +45,11 @@ To recap, the Word2Vec model learns to solve a "fake" problem, which you don't a
 
 Once you've trained the model, you don't actually need the output layer anymore--all that matters is the hidden layer, which will now act as a "Lookup Table" that allows us to quickly get the vector for any given word in the vocabulary. 
 
-<img src='word2vec_weight_matrix_lookup_table.png'>
+<img src='images/word2vec_weight_matrix_lookup_table.png'>
 
 Here's the beautiful thing about this lookup table--when you input a given word, it is passed into the model in a one-hot encoded format. This means that in a vocabulary of 10,000 words, you'll have a `1` at the element that corresponds to the word that we're looking up the word vector for, and `0` for every other element in the vector. If you multiply this one-hot encoded vector by the weight matrix that is our hidden layer, then the vector for every word will be zeroed out, except for the vector that corresponds to the word that you are most interested in!
 
-<img src='matrix_mult_w_one_hot.png'>
+<img src='images/matrix_mult_w_one_hot.png'>
 
 ### Understanding the Intuition Behind Word2Vec
 
@@ -57,7 +57,7 @@ So how does the model actually learn the correct weights for each word in a way 
 
 > "You shall know a word by the company it keeps."  --J.R. Firth, Linguist
 
-In the case of the Word2Vec model, the "company" a word keeps are the words surrounding it, and the model is learning to predict these companions! By exploring many different contexts, the model attempts to decipher which words are appropriate in which contexts. For example, consider the sentence "we have two cats as pets". You could easily substitute the word "cats" for "dogs" and the entire sentence would still make perfect sense. While the meaning of the sentence is undoubdetly changed, there is also a lesson regarding the fact that both are nouns and pets. Without even worrying about the embedding space, you can easily understand that words that have similar meanings will likely also be used in many of the same kinds of sentences. The more similar words are, the more sentences in which they are likely to share context windows! This is exactly what the model is learning, and this is why words that are similar end up near each other inside the embedding space. The ways that they are _not_ similar also helps the model learn to differentiate between them, since there will be patterns here as well. For instance, consider "ran" and "run", and "walk" and "walked". They differ only in tense. From the perspective of the sentences present in a large text corpus (models are commonly trained on all of wikipedia, to give you an idea of the sheer size and scale of most datasets), the model will see numerous examples of how "ran" is similar to "walked", as well as examples of how the context windows for "ran" are different from "run" in the same ways that the context windows for "walked" are different from "walk"! 
+In the case of the Word2Vec model, the "company" a word keeps are the words surrounding it, and the model is learning to predict these companions! By exploring many different contexts, the model attempts to decipher which words are appropriate in which contexts. For example, consider the sentence "we have two cats as pets". You could easily substitute the word "cats" for "dogs" and the entire sentence would still make perfect sense. While the meaning of the sentence is undoubtedly changed, there is also a lesson regarding the fact that both are nouns and pets. Without even worrying about the embedding space, you can easily understand that words that have similar meanings will likely also be used in many of the same kinds of sentences. The more similar words are, the more sentences in which they are likely to share context windows! This is exactly what the model is learning, and this is why words that are similar end up near each other inside the embedding space. The ways that they are _not_ similar also helps the model learn to differentiate between them, since there will be patterns here as well. For instance, consider "ran" and "run", and "walk" and "walked". They differ only in tense. From the perspective of the sentences present in a large text corpus (models are commonly trained on all of Wikipedia, to give you an idea of the sheer size and scale of most datasets), the model will see numerous examples of how "ran" is similar to "walked", as well as examples of how the context windows for "ran" are different from "run" in the same ways that the context windows for "walked" are different from "walk"! 
 
 
 ## Training A Word2Vec Model with Gensim
@@ -74,7 +74,7 @@ To train a Word2Vec model, you first need to import the model from the `gensim` 
 
 Once you've instantiated the model, you'll still need to call the model's `.train()` function, and pass in the following parameters:
 
-* The same dataset that you passed in at instantation
+* The same dataset that you passed in at instantiation
 * The `total_examples`, which is the number of words in the model. You don't need to calculate this manually--instead, you can just pass in the instantiated model's `.corpus_count` attribute for this parameter.
 * The number of `epochs` to train the model for. 
 
