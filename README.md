@@ -37,7 +37,7 @@ The most clever thing about the Word2Vec model is the type of problem it trains 
 
 Word2Vec takes this idea, and flips it on its head. Instead of predicting the next word given a context, the model trains to predict the context surrounding a given word! This means that given the example word "fox" from above, the model should learn to predict the words "quick", "brown", "jumps", and "over", although crucially, not in any particular order. You're likely asking yourself why a model like this would be useful--there are a massive amount of correct contexts that can surround a given word, which means that the output trained model itself likely isn't very useful to us. This intuition is correct--the _output_ of the model is pretty useless to us.  However, in the case of Word2Vec, it's not the model that we're interested in. It turns out that by training to predict the context window for a given word, the neurons in the hidden layer end up learning the embedding space!  This is the reason why the size of the word vectors output by a Word2Vec model are a parameter that you can set ourselves. If you want word vectors of size 300, then you just include 300 neurons in our hidden layer. If you want vectors of size 100, then you include 100 neurons, and so on. Take a look at the following diagram of the Word2Vec model's architecture:
 
-<img src='images/skip_gram_net_arch.png'>
+<img src='images/new_skip_gram_net_arch.png' width="800">
 
 ### Hidden Layers as a "Lookup Table"
 
@@ -45,7 +45,7 @@ To recap, the Word2Vec model learns to solve a "fake" problem, which you don't a
 
 Once you've trained the model, you don't actually need the output layer anymore--all that matters is the hidden layer, which will now act as a "Lookup Table" that allows us to quickly get the vector for any given word in the vocabulary. 
 
-<img src='images/word2vec_weight_matrix_lookup_table.png'>
+<img src='images/new_word2vec_weight_matrix_lookup_table.png' width="600">
 
 Here's the beautiful thing about this lookup table--when you input a given word, it is passed into the model in a one-hot encoded format. This means that in a vocabulary of 10,000 words, you'll have a `1` at the element that corresponds to the word that we're looking up the word vector for, and `0` for every other element in the vector. If you multiply this one-hot encoded vector by the weight matrix that is our hidden layer, then the vector for every word will be zeroed out, except for the vector that corresponds to the word that you are most interested in!
 
@@ -125,3 +125,8 @@ In the next lab, you'll train a Word2Vec model, and then explore the embedding s
 
 
 In this lesson, you learned about how the Word2Vec model actually works, and how you can train and use a Word2Vec model using the `gensim` library!
+
+
+```python
+
+```
